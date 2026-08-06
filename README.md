@@ -57,9 +57,10 @@ AirGoal-10k.
 
 ## 🗺️ Roadmap
 
-- [ ] Release the paper on arXiv.
-- [ ] Release pretrained checkpoints on Hugging Face.
-- [ ] Release the AirGoal-10k dataset on Hugging Face.
+- [x] **Done** — Release video demos on the [🌐 project page](https://duryi.github.io/UA-NWM-Project-Page/).
+- [x] **Done** — Release pretrained checkpoints on [🤗 Hugging Face](https://huggingface.co/DurYi/UA-NWM-Checkpoints/).
+- [ ] **Incoming** — Release the paper on arXiv.
+- [ ] **Incoming** — Release the AirGoal-10k dataset on Hugging Face.
 
 ## 🚀 Getting Started
 
