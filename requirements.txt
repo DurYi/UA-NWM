@@ -1,0 +1,12 @@
+# Install torch/torchvision from the PyTorch CUDA 12.1 index (see README), then:
+#   pip install -r requirements.txt
+# Pinned to the versions the released model was trained/evaluated with (Python 3.10, CUDA 12.1).
+torch==2.5.1
+torchvision==0.20.1
+transformers==5.3.0
+safetensors
+numpy==2.2.6
+pyyaml
+pillow
+tqdm
+matplotlib

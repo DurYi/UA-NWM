@@ -1,0 +1,189 @@
+# =============================================================================
+#  UA-NWM  —  Uncertainty-Aware Navigation World Model  (self-contained recipe)
+# =============================================================================
+#  ONE world model, trained FROM SCRATCH in THREE stages, evaluated as TWO strategies
+#  that share the SAME checkpoint and differ only in how candidates are scored:
+#
+#    * "UA-NWM"               — HEP scorer   (score_metric: hep)
+#    * "UA-NWM_deterministic" — Stage 1+2 mean-predictor cosine    (score_metric: dinov3_cosine)
+#
+#  Training (scripts/train_all.sh):
+#    Stage 1  tokenizer / autoencoder            ]  uanwm/staged_train.py  (torchrun DDP)
+#    Stage 2  delta predictor, rolled out 8 steps]  -> `model`(minus HEP) + `staged_training`
+#    Stage 3  HEP module          ]  uanwm/train_hep.py   (1 GPU, frozen backbone)
+#                                                   -> `model` + `hep_training`
+#  Inference / eval:  offline_ranking (scripts/eval_ranking.sh, 8/16/32-choose-1) and
+#                     offline_planning (scripts/eval_planning.sh, CEM/MPC); metrics ATE / RPE.
+#
+#  NOTE: the `model` block below matches the shipped pretrained/ua-nwm/ua-nwm_best.pt exactly.
+#  Only paths differ.
+# =============================================================================
+
+exp_name: ua_nwm
+seed: 42
+output_dir: outputs
+
+paths:
+  # dataset root holding train/ val/ test/ (see data/airgoal10k)
+  raw_data: data/airgoal10k               # -> raw_data/{train,val}/traj_*
+  train_split: data_splits/airgoal10k/train.txt   # train/traj_* (9000)
+  val_split: data_splits/airgoal10k/val.txt       # val/traj_*   (1000)
+  # dataset-level action normalizer; if missing during training, it is estimated from train split
+  action_stats: data/airgoal10k/action_stats.json
+
+data:
+  dataset: airvln_online
+  action_mode: delta_point_yaw
+  action_dim: 4
+  metric_waypoint_spacing: 5.0
+  normalize_position_delta: true
+  action_stride: 1
+  action_frame: local
+  cache_episode_metadata: true
+  max_train_episodes: null
+  max_val_episodes: null
+  pad_short_context: true          # short-context augmentation
+
+model:
+  # ---- DINOv3 ViT-B/16 frozen encoder ----
+  encoder_name: pretrained/dinov3-vitb16
+  freeze_encoder: true
+  image_size: 224
+  patch_size: 16
+  raw_num_tokens: 196
+  dino_dim: 768
+  d_model: 384
+  # ---- tokenizer: K compressed latent slots ----
+  compressed_tokens: 32            # K  (compressor cross-attn output tokens = AR/predictor token count)
+  # raw DINO -> single TokenCompressor cross-attn
+  # ---- predictor (CausalTransformer) ----
+  predictor_depth: 6
+  predictor_heads: 6
+  mlp_ratio: 4.0
+  dropout: 0.0
+  use_rope: false
+  action_dim: 4
+  action_embed_dim: 384
+  conditioning: adaln
+  predict_delta: true              # ignored when delta_aware.enabled=true (predictor emits raw delta latent)
+  num_register_tokens: 4
+  # ---- token fuser (latent -> dense DINO for reconstruction / mean read-out) ----
+  use_token_fuser: true
+  token_fuser:
+    type: cross_attention
+    depth: 2
+    num_heads: 6
+    num_output_tokens: 196
+    output_dim: 384
+  # ---- delta-aware tokenizer: predictor emits a K-token delta latent; DeltaDecoder
+  #      composes z_{t+1} = z_t (+) delta; DeltaEncoder is the training-time teacher ----
+  delta_aware:
+    enabled: true
+    delta_encoder_layers: 2
+    delta_decoder_layers: 2
+    delta_decoder_residual: true
+  # ---- STAGE-2 ONLY: context-conditioned multi-scale HEP module ----
+  hep:
+    mode: multiscale
+    rank: 2
+    scales: [1, 2, 7, 14]
+    use_context: true
+    context_mode: xattn            # each cell cross-attends the full context tokens
+
+training:
+  mode: online
+  context_len: 4
+  rollout_steps: 2                 # overridden per-stage (stage2=8); base value only
+  batch_size: 12                   # DDP 4-GPU -> effective 48 (rollout=8 memory-safe)
+  num_workers: 4
+  epochs: 50
+  lr: 1.0e-4
+  min_lr: 1.0e-6
+  weight_decay: 0.05
+  warmup_steps: 1000
+  grad_clip_norm: 1.0
+  amp: bf16
+  log_every: 50
+  eval_every: 1
+  save_every: 5
+  max_steps_per_epoch: null
+  compile: false
+  pin_memory: false
+
+loss:
+  supervise_in_dense_dino_space: true
+  dino_mse_weight: 1.0
+  dino_cos_weight: 0.05
+  latent_mse_weight: 0.1
+  reconstruction_mse_weight: 0.1
+
+optimizer:
+  name: adamw
+  betas: [0.9, 0.95]
+
+distributed:
+  enabled: true                    # Stage 1/2 backbone trained with torchrun DDP
+
+# ---- Stage 1 + Stage 2 : delta backbone (uanwm/staged_train.py) ----
+staged_training:
+  stage1:                          # DINO-feature tokenizer (autoencoder + delta encoder/decoder)
+    enabled: true
+    max_steps: 10000
+    lr: 1.0e-4
+    min_lr_ratio: 0.01
+    weight_decay: 0.05
+    warmup_steps: 600
+    grad_clip_norm: 1.0
+    log_every: 50
+    eval_every_steps: 1000
+    save_every_steps: 5000
+    reconstruct_context: true
+    reconstruct_target: true
+    reconstruction_mse_weight: 1.0
+    reconstruction_cos_weight: 0.0
+    latent_noise_std: 0.01
+    delta_noise_std: 0.005
+    abs_mse_weight: 1.0
+    abs_cos_weight: 0.05
+    delta_z_weight: 1.0
+    delta_dense_mse_weight: 1.0
+    delta_dense_cos_weight: 0.2
+    best_metric: val/delta_dense_mse
+  stage2:                          # delta predictor, rolled out 8 steps, per-frame supervised
+    enabled: true
+    max_steps: 24000
+    rollout_steps: 8               # Stage 2 horizon = Stage 3 HEP horizon = 8
+    lr: 1.0e-4
+    min_lr_ratio: 0.01
+    weight_decay: 0.05
+    warmup_steps: 1000
+    grad_clip_norm: 1.0
+    log_every: 50
+    eval_every_steps: 1500
+    save_every_steps: 8000
+    best_metric: val/dino_mse_step_8
+    loss:
+      dino_mse_weight: 1.0
+      dino_cos_weight: 0.05
+      latent_mse_weight: 0.1
+      reconstruction_mse_weight: 0.0
+
+# ---- Stage 3 : HEP module (uanwm/train_hep.py, frozen backbone, 1 GPU) ----
+hep_training:
+  phase: phase1
+  rollout_steps: 8                 # roll8: head rolled out 8 steps, per-step supervised
+  max_steps: 8000
+  lr: 5.0e-4
+  warmup_steps: 300
+  eval_every_steps: 500
+  # frozen Stage 1+2 backbone the head sits on (written by scripts/train_all.sh):
+  init_checkpoint: outputs/ua_nwm/checkpoints/stage2_best.pt
+
+# ---- EVAL : airgoal10k test set; metrics ATE / RPE ----
+eval:
+  dataset: airgoal10k
+  root: data/airgoal10k/test     # test/traj_* (1000, with 32 candidates each)
+  settings: [offline_ranking, offline_planning]
+  # UA-NWM                        scorer -> score_metric: hep    (HEP module)
+  # UA-NWM_deterministic_baseline scorer -> score_metric: dinov3_cosine  (Stage 1+2 mean predictor)
+  # both scored from pretrained/ua-nwm/ua-nwm_best.pt (see scripts/eval_ranking.sh / eval_planning.sh)

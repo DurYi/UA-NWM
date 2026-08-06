@@ -1,0 +1,25 @@
+This project contains code derived from Physical Intelligence's openpi project:
+https://github.com/Physical-Intelligence/openpi
+
+Upstream source snapshot: the main branch retrieved on 2026-07-10.
+
+The derived client/server transport, BasePolicy interface, NumPy MessagePack
+codec, and image utilities are used under the Apache License, Version 2.0.
+The files have been modified for UAV remote inference, including protocol
+envelopes, reset messages, request IDs, deadlines, bounded message sizes,
+structured errors, and client-side safety handling.
+
+Upstream-to-derived file mapping:
+
+- packages/openpi-client/src/openpi_client/base_policy.py
+  -> src/uav_openpi/base_policy.py
+- packages/openpi-client/src/openpi_client/msgpack_numpy.py
+  -> src/uav_openpi/msgpack_numpy.py
+- packages/openpi-client/src/openpi_client/websocket_client_policy.py
+  -> src/uav_openpi/websocket_client_policy.py
+- packages/openpi-client/src/openpi_client/image_tools.py
+  -> src/uav_openpi/image_tools.py
+- src/openpi/serving/websocket_policy_server.py
+  -> src/uav_openpi/websocket_policy_server.py
+- scripts/serve_policy.py -> scripts/serve_policy.py
+- examples/simple_client/main.py -> examples/simple_client.py

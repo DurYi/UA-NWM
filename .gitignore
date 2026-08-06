@@ -216,3 +216,24 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- large model weights (obtain separately; see README) ---
+pretrained/
+*.pt
+*.safetensors
+*.bin
+
+# --- training / eval outputs (regenerated) ---
+outputs/
+logs/
+results/
+/visualization/
+
+# --- external data (symlinked / machine-specific) ---
+data/
+
+# --- python cruft ---
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+.DS_Store

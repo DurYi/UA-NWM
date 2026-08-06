@@ -1,0 +1,36 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "uanwm-real-nav"
+version = "0.1.0"
+description = "Additive WebSocket real-navigation runtime for UA-NWM"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+dependencies = [
+    "msgpack>=1.0.5",
+    "numpy>=1.22.4",
+    "pillow>=9.0.0",
+    "websockets>=14.0,<17",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+nomad = ["PyYAML>=6.0", "diffusers>=0.20", "torch>=2.0"]
+lpips = ["lpips>=0.1.4", "torch>=2.0", "torchvision>=0.15"]
+ua-nwm = ["PyYAML>=6.0", "torch>=2.0", "transformers>=4.30"]
+viz = ["matplotlib>=3.6"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/uav_openpi"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "scripts", "examples", "tests", "README.md", "README.zh-CN.md", "NOTICE", "LICENSE", "pyproject.toml"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
