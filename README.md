@@ -17,7 +17,7 @@ Tsinghua Shenzhen International Graduate School, Tsinghua University
 <sub><sup>&ast;</sup> Equal contribution</sub>
 
 <p align="center">
-  <a href="#"><img src="https://img.shields.io/badge/arXiv-coming%20soon-b31b1b.svg" alt="arXiv"></a>
+  <a href="https://arxiv.org/abs/2608.05597"><img src="https://img.shields.io/badge/arXiv-2608.05597-b31b1b.svg" alt="arXiv"></a>
   <a href="https://duryi.github.io/UA-NWM-Project-Page/"><img src="https://img.shields.io/badge/Project%20Page-UA--NWM-2b6cb0.svg" alt="Project Page"></a>
   <a href="#"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-coming%20soon-yellow.svg" alt="Hugging Face Dataset"></a>
   <a href="https://huggingface.co/DurYi/UA-NWM-Checkpoints/"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Checkpoints-available-yellow.svg" alt="Hugging Face Checkpoints"></a>
@@ -59,7 +59,7 @@ AirGoal-10k.
 
 - [x] **Done** — Release video demos on the [🌐 project page](https://duryi.github.io/UA-NWM-Project-Page/).
 - [x] **Done** — Release pretrained checkpoints on [🤗 Hugging Face](https://huggingface.co/DurYi/UA-NWM-Checkpoints/).
-- [ ] **Incoming** — Release the paper on arXiv.
+- [x] **Done** — Release the paper on [📄 arXiv](https://arxiv.org/abs/2608.05597).
 - [ ] **Incoming** — Release the AirGoal-10k dataset on Hugging Face.
 
 ## 🚀 Getting Started
@@ -297,9 +297,13 @@ documenting their work.
 ## 📚 Citation
 
 ```bibtex
-@article{zhu2026uanwm,
-  title  = {Uncertainty-Aware World Model for Aerial Image-Goal Navigation},
-  author = {Zhu, Deyi and Fan, Haoyu and Zhu, Yinan and Zhang, Weichen and Ma, Shilin and Chen, Xinlei and Tang, Yansong},
-  year   = {2026}
+@misc{zhu2026uanwm,
+      title={Uncertainty-Aware World Model for Aerial Image-Goal Navigation},
+      author={Deyi Zhu and Haoyu Fan and Yinan Zhu and Weichen Zhang and Shilin Ma and Xinlei Chen and Yansong Tang},
+      year={2026},
+      eprint={2608.05597},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2608.05597},
 }
 ```
