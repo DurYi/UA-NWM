@@ -19,13 +19,12 @@ Tsinghua Shenzhen International Graduate School, Tsinghua University
 <p align="center">
   <a href="https://arxiv.org/abs/2608.05597"><img src="https://img.shields.io/badge/arXiv-2608.05597-b31b1b.svg" alt="arXiv"></a>
   <a href="https://duryi.github.io/UA-NWM-Project-Page/"><img src="https://img.shields.io/badge/Project%20Page-UA--NWM-2b6cb0.svg" alt="Project Page"></a>
-  <a href="#"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-coming%20soon-yellow.svg" alt="Hugging Face Dataset"></a>
-  <a href="https://huggingface.co/DurYi/UA-NWM-Checkpoints/"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Checkpoints-available-yellow.svg" alt="Hugging Face Checkpoints"></a>
-  <img src="https://img.shields.io/badge/python-3.10-3776ab.svg" alt="Python">
-  <img src="https://img.shields.io/badge/PyTorch-2.5.1-ee4c2c.svg" alt="PyTorch">
+  <a href="https://huggingface.co/datasets/DurYi/AirGoal-10k"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-yellow.svg" alt="Hugging Face Dataset"></a>
+  <a href="https://pan.baidu.com/s/1xzUz1laMjZY1CyDWNec_FQ?pwd=uawm"><img src="https://img.shields.io/badge/%E2%98%81%EF%B8%8F%20Baidu%20Netdisk-Dataset-2932e1.svg" alt="Baidu Netdisk Dataset"></a>
+  <a href="https://huggingface.co/DurYi/UA-NWM-Checkpoints/"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checkpoints-yellow.svg" alt="Hugging Face Checkpoints"></a>
 </p>
 
-**Official repository** for the paper
+**Official repository** for the [paper](https://arxiv.org/abs/2608.05597)
 _"Uncertainty-Aware World Model for Aerial Image-Goal Navigation."_
 
 </div>
@@ -60,7 +59,7 @@ AirGoal-10k.
 - [x] **Done** — Release video demos on the [🌐 project page](https://duryi.github.io/UA-NWM-Project-Page/).
 - [x] **Done** — Release pretrained checkpoints on [🤗 Hugging Face](https://huggingface.co/DurYi/UA-NWM-Checkpoints/).
 - [x] **Done** — Release the paper on [📄 arXiv](https://arxiv.org/abs/2608.05597).
-- [ ] **Incoming** — Release the AirGoal-10k dataset on Hugging Face.
+- [x] **Done** — Release the AirGoal-10k dataset on [🤗 Hugging Face](https://huggingface.co/datasets/DurYi/AirGoal-10k) and [☁️ Baidu Netdisk](https://pan.baidu.com/s/1xzUz1laMjZY1CyDWNec_FQ?pwd=uawm).
 
 ## 🚀 Getting Started
 
@@ -134,7 +133,24 @@ the optional RAEv2 decoder.
 
 ### 3. Dataset Preparation
 
-Download the dataset from Hugging Face (coming soon) and place it under `data/`.
+Download AirGoal-10k from [Hugging Face](https://huggingface.co/datasets/DurYi/AirGoal-10k)
+and place it under `data/`:
+
+```bash
+hf download DurYi/AirGoal-10k \
+  --repo-type dataset \
+  --local-dir data \
+  --include "airgoal10k/**"
+```
+
+The dataset is also available from
+[Baidu Netdisk](https://pan.baidu.com/s/1xzUz1laMjZY1CyDWNec_FQ?pwd=uawm).
+
+After downloading, the expected local path is:
+
+```text
+data/airgoal10k/
+```
 
 If you store the dataset or checkpoints elsewhere, update `configs/ua_nwm.yaml`:
 
