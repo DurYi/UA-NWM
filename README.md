@@ -4,11 +4,11 @@
 
 ### Uncertainty-Aware World Model for Aerial Image-Goal Navigation
 
-[Deyi Zhu](https://github.com/DurYi/)<sup>&ast;</sup>,
+[Deyi Zhu](https://duryi.github.io)<sup>&ast;</sup>,
 [Haoyu Fan](https://github.com/FanG0D)<sup>&ast;</sup>,
 [Yinan Zhu](https://github.com/Seattle-233),
 [Weichen Zhang](https://scholar.google.com/citations?user=Xsb7crkAAAAJ&hl=zh-CN),
-[Shilin Ma](https://github.com/cyp336/),
+[Shilin Ma](https://msssl.github.io),
 [Xinlei Chen](https://chen-xinlei.com),
 [Yansong Tang](https://andytang15.github.io)<sup>†</sup>
 
@@ -60,6 +60,7 @@ AirGoal-10k.
 - [x] **Done** — Release pretrained checkpoints on [🤗 Hugging Face](https://huggingface.co/DurYi/UA-NWM-Checkpoints/).
 - [x] **Done** — Release the paper on [📄 arXiv](https://arxiv.org/abs/2608.05597).
 - [x] **Done** — Release the AirGoal-10k dataset on [🤗 Hugging Face](https://huggingface.co/datasets/DurYi/AirGoal-10k) and [☁️ Baidu Netdisk](https://pan.baidu.com/s/1xzUz1laMjZY1CyDWNec_FQ?pwd=uawm).
+- [x] **Done** — Release the [onboard Jetson deployment code](deploy/jetson/) for running UA-NWM directly on the UAV.
 
 ## 🚀 Getting Started
 

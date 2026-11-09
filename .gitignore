@@ -229,6 +229,12 @@ logs/
 results/
 /visualization/
 
+# --- local deployment environments and artifacts ---
+/.venv-jetson/
+/deploy/jetson/runtime/
+/deploy/jetson/DEPLOYMENT_REPORT.md
+/deploy/records/
+
 # --- external data (symlinked / machine-specific) ---
 data/
 
