@@ -18,7 +18,7 @@ Usage (see scripts/eval_planning.sh):
   python uanwm/eval/planning_eval.py --config configs/ua_nwm.yaml \
      --checkpoint pretrained/ua-nwm/ua-nwm_best.pt --root data/airgoal10k/test --score_metric hep \
      --sampler anchor --num_samples 32 --topk 16 --opt_steps 3 --dump_raw \
-     --output_dir results/airgoal10k/offline_planning/UA-NWM
+     --output_dir results/airgoal10k/test/offline_planning/UA-NWM
 """
 from __future__ import annotations
 import argparse, json, sys

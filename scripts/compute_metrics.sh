@@ -7,7 +7,7 @@
 #  setting (offline_ranking vs offline_planning) is auto-detected from the raw schema.
 #
 #  Usage:  bash scripts/compute_metrics.sh [RESULTS_DIR]
-#    RESULTS_DIR defaults to results/airgoal10k/offline_ranking
+#    RESULTS_DIR defaults to results/airgoal10k/test/offline_ranking
 #  Output: <RESULTS_DIR>/metrics.json  (+ printed table)
 # =============================================================================
 set -euo pipefail
@@ -15,7 +15,7 @@ REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPO"
 export PYTHONPATH="$REPO:${PYTHONPATH:-}"
 
-OUT="${1:-results/airgoal10k/offline_ranking}"
+OUT="${1:-results/airgoal10k/test/offline_ranking}"
 UA="$OUT/UA-NWM/per_case.json"
 DET="$OUT/UA-NWM_deterministic/per_case.json"
 

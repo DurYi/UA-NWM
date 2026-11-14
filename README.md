@@ -20,7 +20,7 @@ Tsinghua Shenzhen International Graduate School, Tsinghua University
   <a href="https://arxiv.org/abs/2608.05597"><img src="https://img.shields.io/badge/arXiv-2608.05597-b31b1b.svg" alt="arXiv"></a>
   <a href="https://duryi.github.io/UA-NWM-Project-Page/"><img src="https://img.shields.io/badge/Project%20Page-UA--NWM-2b6cb0.svg" alt="Project Page"></a>
   <a href="https://huggingface.co/datasets/DurYi/AirGoal-10k"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Dataset-yellow.svg" alt="Hugging Face Dataset"></a>
-  <a href="https://pan.baidu.com/s/1xzUz1laMjZY1CyDWNec_FQ?pwd=uawm"><img src="https://img.shields.io/badge/%E2%98%81%EF%B8%8F%20Baidu%20Netdisk-Dataset-2932e1.svg" alt="Baidu Netdisk Dataset"></a>
+  <a href="https://pan.baidu.com/s/1dGVTPqca28J5ERgl899obA?pwd=uawm"><img src="https://img.shields.io/badge/%E2%98%81%EF%B8%8F%20Baidu%20Netdisk-Dataset-2932e1.svg" alt="Baidu Netdisk Dataset"></a>
   <a href="https://huggingface.co/DurYi/UA-NWM-Checkpoints/"><img src="https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Checkpoints-yellow.svg" alt="Hugging Face Checkpoints"></a>
 </p>
 
@@ -56,11 +56,12 @@ AirGoal-10k.
 
 ## 🗺️ Roadmap
 
-- [x] **Done** — Release video demos on the [🌐 project page](https://duryi.github.io/UA-NWM-Project-Page/).
-- [x] **Done** — Release pretrained checkpoints on [🤗 Hugging Face](https://huggingface.co/DurYi/UA-NWM-Checkpoints/).
-- [x] **Done** — Release the paper on [📄 arXiv](https://arxiv.org/abs/2608.05597).
-- [x] **Done** — Release the AirGoal-10k dataset on [🤗 Hugging Face](https://huggingface.co/datasets/DurYi/AirGoal-10k) and [☁️ Baidu Netdisk](https://pan.baidu.com/s/1xzUz1laMjZY1CyDWNec_FQ?pwd=uawm).
-- [x] **Done** — Release the [onboard Jetson deployment code](deploy/jetson/) for running UA-NWM directly on the UAV.
+- [x] **2026.11** Release the AirGoal-10k `test_unseen` split on [🤗 Hugging Face](https://huggingface.co/datasets/DurYi/AirGoal-10k) and [☁️ Baidu Netdisk](https://pan.baidu.com/s/1dGVTPqca28J5ERgl899obA?pwd=uawm).
+- [x] **2026.11** Release the [onboard Jetson deployment code](deploy/jetson/) for running UA-NWM directly on the UAV.
+- [x] **2026.08** Release the AirGoal-10k dataset on [🤗 Hugging Face](https://huggingface.co/datasets/DurYi/AirGoal-10k) and [☁️ Baidu Netdisk](https://pan.baidu.com/s/1dGVTPqca28J5ERgl899obA?pwd=uawm).
+- [x] **2026.08** Release the paper on [📄 arXiv](https://arxiv.org/abs/2608.05597).
+- [x] **2026.08** Release pretrained checkpoints on [🤗 Hugging Face](https://huggingface.co/DurYi/UA-NWM-Checkpoints/).
+- [x] **2026.08** Release video demos on the [🌐 project page](https://duryi.github.io/UA-NWM-Project-Page/).
 
 ## 🚀 Getting Started
 
@@ -145,7 +146,7 @@ hf download DurYi/AirGoal-10k \
 ```
 
 The dataset is also available from
-[Baidu Netdisk](https://pan.baidu.com/s/1xzUz1laMjZY1CyDWNec_FQ?pwd=uawm).
+[Baidu Netdisk](https://pan.baidu.com/s/1dGVTPqca28J5ERgl899obA?pwd=uawm).
 
 After downloading, the expected local path is:
 
@@ -156,8 +157,10 @@ data/airgoal10k/
 If you store the dataset or checkpoints elsewhere, update `configs/ua_nwm.yaml`:
 
 - `paths.raw_data` points to the training/validation root.
-- `eval.root` points to the test split.
 - `model.encoder_name` points to the local DINOv3 encoder path or a Hugging Face model ID.
+
+For offline evaluation with a dataset stored elsewhere, set `ROOT` to the directory containing
+the selected split's `traj_*` folders.
 
 ## 🧱 Layout
 
@@ -187,7 +190,8 @@ UA-NWM/
     ├── pseudo_goals/                     # example pseudo-goal images for visualization/debugging
     ├── train/traj_000000..008999/        # 9000 training trajectories
     ├── val/traj_000000..000999/          # 1000 validation trajectories
-    └── test/traj_000000..000999/         # 1000 evaluation trajectories (+32 candidates each)
+    ├── test/traj_000000..000999/         # 1000 evaluation trajectories (+32 candidates each)
+    └── test_unseen/traj_000000..000499/  # 500 evaluation trajectories from held-out scenes (+32 candidates each)
 ```
 
 ### Generated after running scripts
@@ -201,44 +205,56 @@ UA-NWM/
 
 ## 📊 Evaluate the pretrained model
 
+Use `--split test` (the default) or `--split test_unseen` to select the test split for either
+evaluation script.
+
+| Split | Default input | Default output for ranking or planning |
+| --- | --- | --- |
+| `test` | `data/airgoal10k/test` | `results/airgoal10k/test/<setting>/` |
+| `test_unseen` | `data/airgoal10k/test_unseen` | `results/airgoal10k/test_unseen/<setting>/` |
+
+Here `<setting>` is `offline_ranking` or `offline_planning`. Each strategy writes
+`<setting>/<strategy>/per_case.json` and `<setting>/<strategy>/metrics.json`.
+The scripts recompute metrics for both strategies from the raw outputs and save them together
+in `<setting>/metrics.json`. Set `OUT` to override the setting directory.
+
 ### Offline ranking (8/16/32-choose-1)
 
 ```bash
-GPU=0 bash scripts/eval_ranking.sh
+GPU=0 bash scripts/eval_ranking.sh --split test
+GPU=0 bash scripts/eval_ranking.sh --split test_unseen
 ```
 
 Each test case is rolled out once and scored with both inference strategies. The script reports
-ATE / RPE for 8-, 16-, and 32-candidate ranking and writes aggregate metrics to
-`results/airgoal10k/offline_ranking/metrics.json`. Raw per-case ranking decisions and trajectories
-are written to
-`results/airgoal10k/offline_ranking/<strategy>/per_case.json`.
+ATE / RPE for 8-, 16-, and 32-candidate ranking.
 
 ### Offline planning (CEM/MPC, 32x3)
 
 ```bash
-GPU=0 bash scripts/eval_planning.sh
+GPU=0 bash scripts/eval_planning.sh --split test
+GPU=0 bash scripts/eval_planning.sh --split test_unseen
 ```
 
 This runs CEM planning (`--num_samples 32 --topk 16 --opt_steps 3`) once per
 strategy and reports ATE / RPE.
 
-Aggregate metrics are written to `results/airgoal10k/<setting>/metrics.json`. Raw per-case planning
-trajectories are written to `results/airgoal10k/<setting>/<strategy>/per_case.json`.
-
 ### Metrics only (no inference)
 
 ```bash
-bash scripts/compute_metrics.sh results/airgoal10k/offline_ranking     # or .../offline_planning
+bash scripts/compute_metrics.sh results/airgoal10k/test/offline_ranking
+bash scripts/compute_metrics.sh results/airgoal10k/test/offline_planning
+bash scripts/compute_metrics.sh results/airgoal10k/test_unseen/offline_ranking
+bash scripts/compute_metrics.sh results/airgoal10k/test_unseen/offline_planning
 ```
 
 This recomputes ATE / RPE directly from dumped `per_case.json` files with the setting auto-detected.
 It is useful for re-scoring existing runs or validating results produced elsewhere with the same raw
 schema.
 
-We also provide the raw evaluation dumps used for the paper in
-[Google Drive](https://drive.google.com/drive/folders/1j8VcVxT-UD6raGU-tYlwEW3mFCrTVbUN?usp=sharing).
-After downloading, place them under `results/airgoal10k/` and run the command above to reproduce
-the reported ranking and planning metrics.
+Download the raw evaluation dumps from
+[Google Drive](https://drive.google.com/drive/folders/13AuDHVINRZUNKqWKx7V2GLQJO89BoTsy?usp=sharing)
+and place them under `results/airgoal10k/`, preserving their directory structure. Run the metrics
+script on the corresponding setting directory to recompute the ranking or planning metrics.
 
 ## 🎨 DINO latent visualization
 

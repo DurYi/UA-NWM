@@ -13,9 +13,9 @@ normalize positions by metric_waypoint_spacing, keep 3D.
 
 Usage:
   python -m uanwm.eval.validate_from_raw --settings 8 16 32 \
-    --members UA-NWM=results/airgoal10k/offline_ranking/UA-NWM/per_case.json \
-              UA-NWM_deterministic=results/airgoal10k/offline_ranking/UA-NWM_deterministic/per_case.json \
-    --baseline UA-NWM_deterministic --out results/airgoal10k/offline_ranking/metrics.json
+    --members UA-NWM=results/airgoal10k/test/offline_ranking/UA-NWM/per_case.json \
+              UA-NWM_deterministic=results/airgoal10k/test/offline_ranking/UA-NWM_deterministic/per_case.json \
+    --baseline UA-NWM_deterministic --out results/airgoal10k/test/offline_ranking/metrics.json
 """
 from __future__ import annotations
 import argparse, hashlib, json

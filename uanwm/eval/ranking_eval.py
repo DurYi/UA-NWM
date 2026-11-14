@@ -15,7 +15,7 @@ Usage (see scripts/eval_ranking.sh):
   python uanwm/eval/ranking_eval.py --config configs/ua_nwm.yaml \
     --checkpoint pretrained/ua-nwm/ua-nwm_best.pt --root data/airgoal10k/test \
     --score_metric hep --dump_deterministic --dump_raw \
-    --output_dir results/airgoal10k/offline_ranking/UA-NWM
+    --output_dir results/airgoal10k/test/offline_ranking/UA-NWM
 """
 from __future__ import annotations
 
